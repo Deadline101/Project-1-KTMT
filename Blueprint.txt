@@ -1,0 +1,123 @@
+~~~~~~~~~~~~~~~~~~~~> BLUEPRINT <~~~~~~~~~~~~~~~~~~~~
+
+NOTE:   * thiết kế này áp dùng cho chương trìnhh chạy console (phòng TH giao diện ngon lành méo ghép vô được)
+
+        * code phải tách ra 2 phần  - giao diện (dùng để gọi lại code xử lý và xuất thông báo lỗi)
+                                    - code xử lý: throw lỗi nếu cần thiết + xử lý problem
+
+        * khi gọi lại các hàm đã viết (trừ hàm nhập/xuất), phải gọi lại các hàm trong (code xử lý) để tránh hiện mấy thông báo lỗi vớ vẩn lên :)) 
+
+        * something about errors:
+            - lúc kiểm tra phát hiện thấy lỗi phải throw lỗi (ở phần code xử lý)
+            - lỗi phát hiện được phải khai báo vào 1 enum trong file pre.h 
+                vd: 
+                    enum ERROR {
+                        sai_định_dạng,
+                        số_quá_lớn,
+                        // bla bla
+                    };
+
+            - có 1 khối try catch ở hàm giao diện để xử lý lỗi
+
+        * lúc viết code sẽ viết theo dạng như sau 
+
+            #pragma region Giao Diện
+
+                void GiaoDien() {
+                    try {
+                        CodeXuLy(/* parameters */);
+                    }
+                    catch (ERROR e) {
+                        if (e == /* something */) {
+                            cout << "error something" << endl;
+                        }
+                        else if (e == /* something else */) {
+                            cout << "error something else" << endl;
+                        }
+                    }
+                }
+
+            #pragma endregion   // end region giao diện 
+
+            <returnedType> CodeXuLy(/* parameters */) {
+                /* code here */
+
+                return something 
+            }
+
+=========================================================================================================
+=========================================================================================================
+
+~~~~~~~~~~~~~~~~~~~~> SỐ NGUYÊN LỚN <~~~~~~~~~~~~~~~~~~~~
+
+    a. hàm nhập:
+        Giao diện [void ScanQInt()]:
+            hiển thị thông báo nhập,
+            gọi lại hàm ở phần code xử lý, 
+            có thể báo lỗi (sai_định_dạng hoặc số_quá_lớn) nếu có 
+
+        Code xử lý [void ScanQInt(string str)]: 
+            nhập vào 1 string, trả về 1 QInt, 
+            có thể quăng lỗi số_qúa_lớn hoặc sai_định_dạng
+
+    b. hàm xuất: 
+        giao diên [void PrintQInt()]: 
+            hiển thị thông báo xuất, 
+            gọi lại hàm ở phần code xử lý, 
+            xuất kq
+
+        code xử lý [string PrintQInt(QInt x)]: 
+            trả về 1 string sau khi đã convert đống data
+
+    c. dec->bin: 
+        giao diện [void DecToBin()]: 
+            gọi lại hàm nhập ở câu a (có thể quăng lỗi số_quá_lớn hoặc sai_định_dạng)
+            hiển thị kết quả bin
+
+        code xử lý [bool* DecToBin(QInt x)]: 
+            trả về dãy bit sau khi xử lý
+            có thể throw lỗi số_quá_lớn 
+
+    d. bin->dec 
+        [d1]. làm quả hàm nhập liệu bin + kiểm tra coi nhập có đúng k, nếu k đúng thì throw sai_định_dạng
+
+        giao diện [void BinToDec()]: 
+            gọi hàm d1, xuất thông báo lỗi (sai_định_dạng) nếu có,
+            gọi hàm code xử lý
+            hiển thị kết quả hoặc xuất thông báo lỗi (số_quá_lớn) nếu có
+
+        code xử lý [bool* BinToDec(bool *bit)]: 
+            tính toán trả về 1 dãy bool
+            có thể sẽ throw lỗi số_quá_lớn
+
+    e. bin->hex 
+        giao diện [void BinToHex()]:
+            gọi hàm [d1] để nhập liệu, có thể throw số_qúa_lớn
+            gọi hàm code xử lý
+            xuất thông báo lỗi (sai_định_dạng hoặc số_quá_lớn) nếu có 
+            
+        code xử lý [string BinToDec(bool *bit)]: 
+            xử lý trả về string 
+            hoặc throw lỗi số_quá_lớn 
+
+    f. dec->hex 
+        giao diện [void DecToHex()]:
+            gọi hàm nhập liệu ở câu a (có thể quăng lỗi sai_định_dạng hoặc số_quá_lớn)
+            xuất kết quả :)) 
+
+        code xử lý [string DecToHex(QInt x)]
+
+    g. Toán tử + - * / làm bth :)) méo có gì vui cả :))
+
+    h. Toán tử < > == >= <= = làm bth :)) méo có gì vui cả :))
+
+    i. Toán tử & | ^ ~ làm bth :)) méo có gì vui cả :))
+
+    j. Toán tử >> <<, các hàm rol, ror làm bth :)) méo có gì vui cả :))
+
+
+=========================================================================================================
+=========================================================================================================
+
+~~~~~~~~~~~~~~~~~~~~> SỐ CHẤM ĐỘNG ĐỘ CHÍNH XÁC CAO <~~~~~~~~~~~~~~~~~~~~
+
