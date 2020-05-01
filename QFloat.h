@@ -1,11 +1,10 @@
-#include "stdio.h"
-#include "stdlib.h"
+#ifndef QFLOAT_H_
+#define QFLOAT_H_
 
-#include "iostream"
-using namespace std;
-
-#include "string"
+#include "pre.h"
 
 class QFloat {
 
 };
+
+#endif

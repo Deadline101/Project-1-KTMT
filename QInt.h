@@ -1,11 +1,10 @@
-#include "stdio.h"
-#include "stdlib.h"
+#ifndef QINT_H_
+#define QINT_H_
 
-#include "iostream"
-using namespace std;
-
-#include "string"
+#include "pre.h"
 
 class QInt {
     
 };
+
+#endif
