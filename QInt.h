@@ -5,7 +5,6 @@
 
 class QInt {
     public:
-
     #pragma region interface :)
 
         /************* INPUT // not completed yet :))// *************/
@@ -33,10 +32,10 @@ class QInt {
             for (int i = 0; i < 128; i++) {
                 a = getBitAt(i) & q.getBitAt(i);
                 if (a) {
-                    res.setBit1(i);
+                    res.setBit(i, 1);
                 }
                 else {
-                    res.setBit0(i);
+                    res.setBit(i, 0);
                 }
             }
             return res;
@@ -49,10 +48,10 @@ class QInt {
             for (int i = 0; i < 128; i++) {
                 a = getBitAt(i) | q.getBitAt(i);
                 if (a) {
-                    res.setBit1(i);
+                    res.setBit(i, 1);
                 }
                 else {
-                    res.setBit0(i);
+                    res.setBit(i, 0);
                 }
             }
             return res;
@@ -65,10 +64,10 @@ class QInt {
             for (int i = 0; i < 128; i++) {
                 a = getBitAt(i) ^ q.getBitAt(i);
                 if (a) {
-                    res.setBit1(i);
+                    res.setBit(i, 1);
                 }
                 else {
-                    res.setBit0(i);
+                    res.setBit(i, 0);
                 }
             }
             return res;
@@ -79,10 +78,10 @@ class QInt {
             QInt res;
             for (int i = 0; i < 128; i++) {
                 if (getBitAt(i)) {
-                    res.setBit0(i);
+                    res.setBit(i, 0);
                 }
                 else {
-                    res.setBit1(i);
+                    res.setBit(i, 1);
                 }
             }
         }
@@ -93,12 +92,44 @@ class QInt {
         }
 
         /************* OPERATOR < *************/
-        /************* OPERATOR <= *************/
-        /************* OPERATOR >= *************/
-        /************* OPERATOR == *************/
-        /************* OPERATOR = *************/
+        bool operator<(QInt q) {
 
-        /************* DEC TO HEX *************/
+        }
+
+        /************* OPERATOR <= *************/
+        bool operator<=(QInt q) {
+
+        }
+
+        /************* OPERATOR >= *************/
+        bool operator>=(QInt q) {
+
+        }
+
+        /************* OPERATOR == (not tested yet) *************/
+        bool operator==(QInt q) {
+            for (int i = 0; i < 127; i++) {
+                if (getBitAt(i) != q.getBitAt(i)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /************* OPERATOR = (not tested yet) *************/
+        // QInt& operator=(const string q) {
+            
+        // }
+        QInt& operator=(const QInt& q) {
+            if (this != &q) {
+                for (int i = 0; i < 4; i++) {
+                    _data[i] = q._data[i];
+                }
+            }
+            return *this;
+        }
+
+        /************* DEC TO HEX (tested) *************/
         void DecToHex() {
             QInt x;
             // in a basic way :))
@@ -116,6 +147,27 @@ class QInt {
                 }
             }
         }
+
+        // /************* OPERATOR + *************/
+        // QInt operator+(QInt q) {
+        //     QInt res;
+        //     int temp1 = 0;
+        //     int temp2 = 0;
+
+        //     for (int i = 127; i >= 0; i--) {
+        //         temp1 = getBitAt(i) + q.getBitAt(i);
+        //         if (temp1 == 2) {
+        //             res.setBit(i, 0);
+        //             temp2 = 1;
+        //         }
+        //         else if (temp1 == 0) {
+        //             res.setBit(i, 0);
+        //         }
+        //         else {
+        //             res.setBit(i, 1);
+        //         }
+        //     }
+        // }
 
     #pragma endregion
 
@@ -201,7 +253,7 @@ class QInt {
             }
         }
 
-        bool checkSpell(string str) {
+        bool checkSpelling(string str) {
             // check if input = "@#qwi123123" -> throw wrong_input
             if (!(str[0] == '-' || str[0] == '+' || (str[0] >= '0' && str[0] <= '9'))) {
                 return false;
@@ -220,7 +272,7 @@ class QInt {
             cout << "Enter QInt: ";
             getline(cin, str);
 
-            if (!checkSpell(str)) {
+            if (!checkSpelling(str)) {
                 throw WRONG_FORMAT;
             }
 
@@ -242,9 +294,9 @@ class QInt {
 
             // if str == "-something" is true
             if (sign) {
+                // invert bit string and add 1 :))
                 ~*this;
-                setBit1(0);
-
+                // add 1 here
             }
 
             // // out of range
@@ -259,11 +311,11 @@ class QInt {
             while (true) {
                 // setup QInt x
                 if ((int)(str[str.length() - 1] - 48) % 2 == 0) {
-                    setBit0(count);
+                    setBit(count, 0);
                     count--;
                 }
                 else {
-                    setBit1(count);
+                    setBit(count, 1);
                     count--;
                 }
                 // throw OUT_OF_RANGE
@@ -280,18 +332,25 @@ class QInt {
             }
         }
 
-        void setBit1(int index) {
-            int q = index / 32;
-            int r = index % 32;
+        // void setBit1(int index) {
+        //     int q = index / 32;
+        //     int r = index % 32;
 
-            _data[q] | (1 << (31 - r));
-        }
+        //     _data[q] | (1 << (31 - r));
+        // }
 
-        void setBit0(int index) {
-            int q = index / 32;
-            int r = index % 32;
+        // void setBit0(int index) {
+        //     int q = index / 32;
+        //     int r = index % 32;
 
-            _data[q] | (0 << (31 - r));
+        //     _data[q] | (0 << (31 - r));
+        // }
+
+        void setBit(int pos, bool value) {
+            int q = pos / 32;
+            int r = pos % 32;
+
+            _data[q] | (value << (31 - r));
         }
 
         int getBitAt(int index) {
@@ -315,8 +374,10 @@ class QInt {
 
         }
 
+    private:
+
         // apply for small num
-        static
+        // static
         int binToDec(string bitStr) {
             int res = 0;
             for (int i = bitStr.length() - 1; i >= 0; i--) {
@@ -324,7 +385,6 @@ class QInt {
             }
             return res;
         }
-    private:
 
         int _data[4];
 };
