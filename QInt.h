@@ -98,7 +98,7 @@ class QInt {
         /************* OPERATOR == *************/
         /************* OPERATOR = *************/
 
-        /************* dec->hex *************/
+        /************* DEC TO HEX *************/
         void DecToHex() {
             QInt x;
             // in a basic way :))
@@ -128,10 +128,13 @@ class QInt {
             for (int i = 127; i >= 0; i--) {
                 tempstr = tempstr.insert(0, to_string(getBitAt(i)));
                 count++;
+                // cut every 4bits
                 if (count == 4) {
                     count = 0;                      // reset counter
                     tempnum = binToDec(tempstr);    // convert bin -> dec (apply for small num)
                     tempstr = "";                   // reset tempstr
+
+                    // create res
                     if (tempnum >= 0 || tempnum <= 9) {
                         res = res.insert(0, to_string(tempnum));
                     }
@@ -164,6 +167,7 @@ class QInt {
                     }
                 }
             }
+            // cut all the 0 at head
             while (true) {
                 if (res[0] == '0') {
                     res = res.substr(1);
