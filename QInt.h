@@ -8,7 +8,7 @@ class QInt {
 
     #pragma region interface :)
 
-        /************* INPUT *************/
+        /************* INPUT // not completed yet :))// *************/
         void ScanQInt() {
             QInt x;
 
@@ -26,7 +26,7 @@ class QInt {
             }
         }
 
-        /************* LOGIC: OPERATOR AND (&) *************/
+        /************* LOGIC: OPERATOR AND (&)(not tested yet) *************/
         QInt operator&(QInt q) {
             QInt res;
             int a;
@@ -42,7 +42,7 @@ class QInt {
             return res;
         }
 
-        /************* LOGIC: OPERATOR OR (|) *************/
+        /************* LOGIC: OPERATOR OR (|)(not tested yet) *************/
         QInt operator|(QInt q) {
             QInt res;
             int a;
@@ -58,7 +58,7 @@ class QInt {
             return res;
         }
 
-        /************* LOGIC: OPERATOR XOR (^) *************/
+        /************* LOGIC: OPERATOR XOR (^)(not tested yet) *************/
         QInt operator^(QInt q) {
             QInt res;
             int a;
@@ -74,7 +74,7 @@ class QInt {
             return res;
         }
 
-        /************* LOGIC: OPERATOR NOT (~) *************/
+        /************* LOGIC: OPERATOR NOT (~)(not tested yet) *************/
         QInt operator~() {
             QInt res;
             for (int i = 0; i < 128; i++) {
@@ -88,9 +88,9 @@ class QInt {
         }
 
         /************* LOGIC: OPERATOR > *************/
-        // bool operator>(QInt q) {
+        bool operator>(QInt q) {
 
-        // }
+        }
 
         /************* OPERATOR < *************/
         /************* OPERATOR <= *************/
@@ -120,7 +120,59 @@ class QInt {
     #pragma endregion
 
         string DecToHex(QInt x) {
-            
+            string res = "";
+            string tempstr = "";
+            int tempnum = 0;
+
+            int count = 0;
+            for (int i = 127; i >= 0; i--) {
+                tempstr = tempstr.insert(0, to_string(getBitAt(i)));
+                count++;
+                if (count == 4) {
+                    count = 0;                      // reset counter
+                    tempnum = binToDec(tempstr);    // convert bin -> dec (apply for small num)
+                    tempstr = "";                   // reset tempstr
+                    if (tempnum >= 0 || tempnum <= 9) {
+                        res = res.insert(0, to_string(tempnum));
+                    }
+                    else {
+                        switch (tempnum) {
+                            case 10: {
+                                res = res.insert(0, "A");
+                            } break;
+
+                            case 11: {
+                                res = res.insert(0, "B");
+                            } break;
+
+                            case 12: {
+                                res = res.insert(0, "C");
+                            } break;
+
+                            case 13: {
+                                res = res.insert(0, "D");
+                            } break;
+
+                            case 14: {
+                                res = res.insert(0, "E");
+                            } break;
+
+                            case 15: {
+                                res = res.insert(0, "F");
+                            } break;
+                        }
+                    }
+                }
+            }
+            while (true) {
+                if (res[0] == '0') {
+                    res = res.substr(1);
+                }
+                else {
+                    break;
+                }
+            }
+            return res;
         }
 
         void divideByTwo(string str, string &res) {
@@ -158,6 +210,7 @@ class QInt {
             return true;
         }
 
+        // not done yet
         void ScanQInt(QInt &x) {
             string str;
             cout << "Enter QInt: ";
@@ -196,6 +249,7 @@ class QInt {
             // }
         }
 
+        // make a bit string (128 bits)
         void setBitSequence(string str) {
             int count = 127;
             while (true) {
@@ -257,7 +311,17 @@ class QInt {
 
         }
 
+        // apply for small num
+        static
+        int binToDec(string bitStr) {
+            int res = 0;
+            for (int i = bitStr.length() - 1; i >= 0; i--) {
+                res += (int)(bitStr[i] - 48) * pow(2, bitStr.length() - i - 1);
+            }
+            return res;
+        }
     private:
+
         int _data[4];
 };
 
