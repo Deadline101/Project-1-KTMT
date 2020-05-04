@@ -8,6 +8,7 @@
 using namespace std;
 
 #include "string"
+#include "math.h"
 
 // viết code thì include file này vào,, 
 // add thư viện vào đây nhá :)) 
