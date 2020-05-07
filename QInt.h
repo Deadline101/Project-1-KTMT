@@ -403,7 +403,6 @@ class QInt {
             }
         }
 
-
         // check spelling of input string 
         bool checkSpelling(string str) {
             // "-123" and "123" are ok but "+123" is not :>
