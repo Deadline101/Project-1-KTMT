@@ -8,7 +8,6 @@
 
 class QInt {
     public:
-
         // input
         void ScanQInt() {
             try {
@@ -131,10 +130,117 @@ class QInt {
             return *this;
         }
 
+        // operator ==
+        bool operator==(QInt q) {
+            for (int i = 0; i < 128; i++) {
+                if (getBitAt(i, *this) != getBitAt(i, q)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+/*  * operator+, written by TheMinh, rewrite by BaoLong
+    QInt operator +(QInt & const qint) {
+		string newStringBin;
+		newStringBin = this->Cong2DayBit(this->StringBin(), qint.StringBin());
+		this->modifireStringBin(newStringBin);
+		return *this;
+	}
+*/
+    QInt operator+(QInt q) {
+        // recall optAdd(QInt, QInt): return QInt
+        return optAdd(*this, q);
+    }
+
+/*  * operator-, written by TheMinh, reWrite by BaoLong
+	QInt operator -(QInt & const qint) {
+		string newStringBin;
+		newStringBin = this->Cong2DayBit(this->StringBin(), QInt::Offset2(qint.StringBin()));
+		this->modifireStringBin(newStringBin);
+		return *this;
+	}
+*/
+    QInt operator-(QInt q) {
+        // create a two'2 complement number
+        QInt temp;
+        temp = "1";
+        temp = temp + ~q;
+
+        // return *this + that two'2 complement number (using operator +)
+        return *this + temp;
+    }
+
+/*  * operator *
+	QInt operator *(QInt & const qint) {
+		string multi = QInt::Nhan2Daybit(this->StringBin(), qint.StringBin());
+		string newStringBin = multi;
+		this->modifireStringBin(newStringBin);
+		return *this;
+	}
+*/
+
+
+	// QInt operator /(QInt & const qint) {
+		
+	// }
+
+    // operator>>
+    // QInt operator>>(int n) {
+    //     // return optShiftLeft(*this, n);
+    // }
+
+    // // operator<<
+    // QInt operator<<(int n) {
+    //     // return optShiftLeft(*this, n);
+    // }
+
+        // operator >
+        bool operator>(QInt q) {
+            return optGreaterThan(*this, q);
+        }
+
+        // operator <
+        bool operator<(QInt q) {
+            return optSmallerThan(*this, q);
+        }
+
+        // operator <=
+        bool operator<=(QInt q) {
+            return optSmallerThanOrEqual(*this, q);
+        }
+
+        // operator >=
+        bool operator>=(QInt q) {
+            return optGreaterThanOrEqual(*this, q);
+        }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // input: bit string
-        // output: string (hexadecimal)
+        // opt <<
+        // input: QInt, QInt
+        QInt optShiftLeft(QInt q1, QInt q2) {
+            string str = DecToBin(q1);
+        }
+
+        // opt <<
+        // input: QInt, int
+        QInt optShiftLeft(QInt q1, int n) {
+            string str = DecToBin(q1);
+            str = str.substr(0, n);
+
+            while (str.length() != 128) {
+                str += "0";
+            }
+
+            QInt q = BinToDec(str);
+            return q;
+        }
+
+        /*  bin to hex 
+            input: bit string
+            output: string (hexadecimal)
+        */
         string BinToHex(string bit) {
             while (bit[0] == '0') {
                 bit = bit.substr(1);
@@ -208,8 +314,10 @@ class QInt {
             return true;
         }
 
-        // input: bit (unchecked)
-        // output: QInt (just setbit into QInt)
+        /*  bin to dec
+            input: bit (unchecked)
+            output: QInt (just setbit into QInt)
+        */
         QInt BinToDec(string bit) {
             while (bit[0] == '0') { // bit = "00000001" -> bit = "1"
                 bit = bit.substr(1);
@@ -230,8 +338,10 @@ class QInt {
             return q;
         }
 
-        // input: QInt (input from keyboard)
-        // output: string (binary)
+        /*  dec to bin
+            input: QInt (input from keyboard)
+            output: string (binary)
+        */
         string DecToBin(QInt x) {
             string str;
             int count = 0;
@@ -251,7 +361,7 @@ class QInt {
             QInt temp = q;
             if (getBitAt(0, temp) == 1) {
                 QInt one;
-                ScanQInt(one, "1");
+                one = "1";
                 temp = optAdd(optNot(temp), one);
             }
 
@@ -266,7 +376,6 @@ class QInt {
             }
             return str;
         }
-
 
         void ScanQInt(QInt &q, string str) {
             if (!checkSpelling(str)) {
@@ -418,7 +527,7 @@ class QInt {
             return true;
         }
 
-        static void divideByTwo(string str, string &res) {
+        void divideByTwo(string str, string &res) {
             if (str.length() == 1 && str[0] < '2') {
                 return;
             }
@@ -457,7 +566,9 @@ class QInt {
             else if (str.length() > min.length()) {
                 return true;
             }
-            else if (min == str || max == str) {
+            // min = -(a + 1), max = a (a > 0)
+            // if str = (a + 1) -> outOfRange
+            else if ((min == str && sign) || (max == str && !sign)) {
                 return false;
             } 
 
@@ -529,6 +640,99 @@ class QInt {
             for (int i = 0; i < 4; i++) {
                 _data[i] = q._data[i];
             }
+        }
+
+        /*  opt >
+            input: QInt, QInt
+            output: q1 > q2 ? true : false
+        */
+        bool optGreaterThan(QInt q1, QInt q2) {
+            string str1 = PrintQInt(q1);
+            string str2 = PrintQInt(q2);
+
+            if (str1 == str2) {
+                return false;
+            }
+
+            bool s1 = false, s2 = false;
+            if (str1[0] == '-') {
+                s1 = true;
+                str1 = str1.substr(1);
+            }
+            if (str2[0] == '-') {
+                s2 = true;
+                str2 = str2.substr(1);
+            }
+
+            // compare negative to positive
+            if (s1 == true && s2 == false) {
+                return false;
+            }
+            // compare positive to negative
+            else if (s1 == false && s2 == true) {
+                return true;
+            }
+
+            bool isGreaterThan; // compate 2 unsigned string
+            if (str1.length() > str2.length()) {
+                isGreaterThan = true;
+            }
+            else if (str1.length() < str2.length()) {
+                isGreaterThan = false;
+            }
+            else {
+                // str1.length() = str2.length()
+                int count = 0;
+                while (str2[count] == str1[count]) {
+                    count++;
+                }
+                if (str1[count] > str2[count]) {
+                    isGreaterThan = true;
+                }
+                else {
+                    isGreaterThan = false;
+                }
+            }
+
+            if (s1 == true && s2 == true) {
+                return !isGreaterThan;
+            }
+            else if (s1 == false && s2 == false) {
+                return isGreaterThan;
+            }
+        } 
+
+        /*  opt <
+            input: QInt, QInt
+            output: q1 < q2 ? true : false
+        */
+        bool optSmallerThan(QInt q1,QInt q2) {
+            if (!optGreaterThan(q1, q2) && !(q1 == q2)) {
+                return true;
+            }
+            return false;
+        }
+
+        /*  opt >=
+            input: QInt, QInt
+            output: q1 >= q2 ? true : false
+        */
+        bool optGreaterThanOrEqual(QInt q1,QInt q2) {
+            if (optGreaterThan(q1, q2) || q1 == q2) {
+                return true;
+            }
+            return false;
+        }
+
+        /*  opt <=
+            input: QInt, QInt
+            output: q1 <= q2 ? true : false
+        */
+        bool optSmallerThanOrEqual(QInt q1,QInt q2) {
+            if (!optGreaterThan(q1, q2)) {
+                return true;
+            }
+            return false;
         }
 
     private:
