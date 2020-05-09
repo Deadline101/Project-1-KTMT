@@ -34,7 +34,19 @@ class QInt {
                 getline(cin, str);
                 QInt q;
                 ScanQInt(q, str);
-                cout << "Output: " << DecToBin(q) << endl;
+                str = DecToBin(q);
+
+                // print :> a little bit of make color
+                int count = 0;
+                cout << "Output: ";
+                for (int i = 0; i < str.length(); i++) {
+                    cout << str[i];
+                    count++;
+                    if (count == 4) {
+                        count = 0;
+                        cout << " ";
+                    }
+                }
             }
             catch (ERROR e) {
                 catchError(e);
@@ -148,10 +160,10 @@ class QInt {
 		return *this;
 	}
 */
-    QInt operator+(QInt q) {
-        // recall optAdd(QInt, QInt): return QInt
-        return optAdd(*this, q);
-    }
+        QInt operator+(QInt q) {
+            // recall optAdd(QInt, QInt): return QInt
+            return optAdd(*this, q);
+        }
 
 /*  * operator-, written by TheMinh, reWrite by BaoLong
 	QInt operator -(QInt & const qint) {
@@ -161,15 +173,15 @@ class QInt {
 		return *this;
 	}
 */
-    QInt operator-(QInt q) {
-        // create a two'2 complement number
-        QInt temp;
-        temp = "1";
-        temp = temp + ~q;
+        QInt operator-(QInt q) {
+            // create a two'2 complement number
+            QInt temp;
+            temp = "1";
+            temp = temp + ~q;
 
-        // return *this + that two'2 complement number (using operator +)
-        return *this + temp;
-    }
+            // return *this + that two'2 complement number (using operator +)
+            return *this + temp;
+        }
 
 /*  * operator *
 	QInt operator *(QInt & const qint) {
@@ -179,21 +191,62 @@ class QInt {
 		return *this;
 	}
 */
+        // operator *
+        QInt operator*(QInt q) {
+            return optMultiply(*this, q);
+        }
 
+// QInt operator /(QInt & const qint) {
+    
+// }
 
-	// QInt operator /(QInt & const qint) {
-		
-	// }
+        // operator>>
+        QInt operator>>(int n) {
+            return optShiftRight(*this, n);
+        }
 
-    // operator>>
-    // QInt operator>>(int n) {
-    //     // return optShiftLeft(*this, n);
-    // }
+        // operator<<
+        QInt operator<<(int n) {
+            return optShiftLeft(*this, n);
+        }
 
-    // // operator<<
-    // QInt operator<<(int n) {
-    //     // return optShiftLeft(*this, n);
-    // }
+        // rol
+        QInt rol(QInt q, int n) {
+            QInt res = q;
+            string str = DecToBin(res);
+
+            int temp;
+            // temp = bit[0]
+            // delete bit[0] in bit string
+            // bit string += bit[0]
+            for (int i = 0; i < n; i++) {
+                temp = (int)(str[0] - 48);
+                str = str.substr(0);
+                str += to_string(temp);
+            }
+
+            res = BinToDec(str);
+            return res;
+        }
+
+        // ror
+        QInt ror(QInt q, int n) {
+            QInt res = q;
+            string str = DecToBin(res);
+
+            int temp;
+            // temp = bit[127]
+            // delete bit[127] in bit string
+            // insert bit[127] into bit string at pos 0
+            for (int i = 0; i < n; i++) {
+                temp = (int)(str[127] - 48);
+                str = str.substr(0, 127);
+                str.insert(0, to_string(temp));
+            }
+
+            res = BinToDec(str);
+            return res;
+        }
 
         // operator >
         bool operator>(QInt q) {
@@ -217,20 +270,93 @@ class QInt {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // opt <<
-        // input: QInt, QInt
-        QInt optShiftLeft(QInt q1, QInt q2) {
-            string str = DecToBin(q1);
+        /*  multiply 2 QInt
+            input: 2 QInt
+            output: QInt (res)
+        */
+        QInt optMultiply(QInt q1, QInt q2) {
+            bool s1 = false, s2 = false;
+            if (getBitAt(0, q1) == 1) {
+                s1 = true;
+                QInt temp;
+                temp = "1";
+                q1 = ~q1 + temp;
+            }
+            if (getBitAt(0, q2) == 1) {
+                s2 = true;
+                QInt temp;
+                temp = "1";
+                q2 = ~q2 + temp;
+            }
+
+            string str1 = DecToBin(q1);
+            string str2 = DecToBin(q2);
+            string res = "";
+            res = str2;
+            for (int i = 0; i < 129; i++) {
+                res = '0' + res;
+            }
+            int k = 128;
+            string m, q;
+            while (k > 0) {
+                if (res[256] == '1') {
+                    m = res.substr(1, 128);
+                    q = res.substr(129, 128);
+                    m = DecToBin(BinToDec(m) + BinToDec(str1));
+                    res = '0' + m + q;
+                }
+                res.erase(res.end() - 1);
+                res.insert(res.begin(), '0');
+                k--;
+            }
+            res = res.substr(129, 128);
+            if ((s1 == false && s2 == true) || (s1 == true && s2 == false)) {
+                QInt temp;
+                temp = "1";
+                res = DecToBin(~BinToDec(res) + temp);
+            }
+            return BinToDec(res);
         }
 
-        // opt <<
-        // input: QInt, int
+        /*  divide 2 QInt
+            input: 2QInt
+            output: QInt (res)
+        */
+        // QInt optDivide(QInt)
+
+        /*  opt <<
+            input: QInt, n
+            output: QInt (res)
+        */
         QInt optShiftLeft(QInt q1, int n) {
             string str = DecToBin(q1);
-            str = str.substr(0, n);
+            str = str.substr(n);
 
             while (str.length() != 128) {
                 str += "0";
+            }
+
+            QInt q = BinToDec(str);
+            return q;
+        }
+
+        /*  opt >>
+            input: QInt, n
+            output: QInt (res)
+        */
+        QInt optShiftRight(QInt q1, int n) {
+            string str = DecToBin(q1);
+            str = str.substr(0, str.length() - n);
+
+            if (str[0] == '1') {
+                while (str.length() != 128) {
+                    str.insert(0, "1");
+                }
+            }
+            else {
+                while (str.length() != 128) {
+                    str.insert(0, "0");
+                }
             }
 
             QInt q = BinToDec(str);
@@ -344,18 +470,16 @@ class QInt {
         */
         string DecToBin(QInt x) {
             string str;
-            int count = 0;
             for (int i = 0; i < 128; i++) {
                 str += to_string(getBitAt(i, x));
-                count++;
-                if (count == 4) {
-                    count = 0;
-                    str += ' ';
-                }
             }
             return str;
         }
 
+        /*  printQInt
+            input: QInt
+            output: string (decimal)
+        */
         string PrintQInt(QInt q) {
             string str = "0";
             QInt temp = q;
@@ -551,105 +675,25 @@ class QInt {
 
         bool inputOutOfRange(string str) {
             string min = MIN_QINT, max = MAX_QINT;
-            min = min.substr(1);
 
-            bool sign = false;
-            if (str[0] == '-') {
-                sign = true;
-                str = str.substr(1);
-            }
-
-            // from now on: min.length() = max.length()
-            if (str.length() < min.length()) {
+            if (str == min || str == max) {
                 return false;
             }
-            else if (str.length() > min.length()) {
+            // if str > max
+            if (greaterThan(str, max)) {
                 return true;
             }
-            // min = -(a + 1), max = a (a > 0)
-            // if str = (a + 1) -> outOfRange
-            else if ((min == str && sign) || (max == str && !sign)) {
-                return false;
-            } 
-
-            // str.length() = min.length()
-            int count = 0;
-            while (true) {
-                if (sign) {
-                    if (str[count] == min[count]) {
-                        count++;
-                    }
-                }
-                else {
-                    if (str[count] == max[count]) {
-                        count++;
-                    }
-                }
-            }
-
-            if (sign) {
-                if (str[count] > min[count]) {
-                    return true;
-                }
-            }
-            else {
-                if (str[count] > max[count]) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // return bitSequence of QInt q
-        void testScan(QInt q) {
-            int count = 0;
-            for (int i = 0; i < 128; i++) {
-                cout << getBitAt(i, q);
-                count++;
-                if (count == 4) {
-                    cout << " ";
-                    count = 0;
-                }
-            }
-            cout << endl;
-        }
-
-        QInt() {
-            for (int i = 0; i < 4; i++) {
-                _data[i] = 0;
+            // if str <= min. but str cant equal to min because the first if-clause has already solved that :)
+            if (!greaterThan(str, min)) {
+                return true;
             }
         }
 
-        void setBit(int pos, bool value, QInt &n) {
-            int q = pos / 32;
-            int r = pos % 32;
-
-            n._data[q] = n._data[q] | (value << (31 - r));
-        }
-
-        int getBitAt(int index, QInt n) {
-            int q = index / 32;
-            int r = index % 32;
-
-            return (n._data[q] >> (31 - r)) & 1;
-        }
-
-        QInt (const QInt &q) {
-            for (int i = 0; i < 4; i++) {
-                _data[i] = q._data[i];
-            }
-        }
-
-        /*  opt >
-            input: QInt, QInt
-            output: q1 > q2 ? true : false
+        /*  compare 2 string
+            input: 2 signed string
+            output: str1 > str2 ? true : false
         */
-        bool optGreaterThan(QInt q1, QInt q2) {
-            string str1 = PrintQInt(q1);
-            string str2 = PrintQInt(q2);
-
+        bool greaterThan(string str1, string str2) {
             if (str1 == str2) {
                 return false;
             }
@@ -700,6 +744,17 @@ class QInt {
             else if (s1 == false && s2 == false) {
                 return isGreaterThan;
             }
+        }
+
+        /*  opt >
+            input: QInt, QInt
+            output: q1 > q2 ? true : false
+        */
+        bool optGreaterThan(QInt q1, QInt q2) {
+            string str1 = PrintQInt(q1);
+            string str2 = PrintQInt(q2);
+
+            return greaterThan(str1, str2);
         } 
 
         /*  opt <
@@ -733,6 +788,55 @@ class QInt {
                 return true;
             }
             return false;
+        }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // return bitSequence of QInt q
+        void testScan(QInt q) {
+            int count = 0;
+            for (int i = 0; i < 128; i++) {
+                cout << getBitAt(i, q);
+                count++;
+                if (count == 4) {
+                    cout << " ";
+                    count = 0;
+                }
+            }
+            cout << endl;
+        }
+
+        // return bitSequence of QInt q
+        void testScan() {
+            testScan(*this);
+        }
+
+        // constructor
+        QInt() {
+            for (int i = 0; i < 4; i++) {
+                _data[i] = 0;
+            }
+        }
+
+        void setBit(int pos, bool value, QInt &n) {
+            int q = pos / 32;
+            int r = pos % 32;
+
+            n._data[q] = n._data[q] | (value << (31 - r));
+        }
+
+        int getBitAt(int index, QInt n) {
+            int q = index / 32;
+            int r = index % 32;
+
+            return (n._data[q] >> (31 - r)) & 1;
+        }
+
+        // copy constructor
+        QInt (const QInt &q) {
+            for (int i = 0; i < 4; i++) {
+                _data[i] = q._data[i];
+            }
         }
 
     private:
@@ -783,16 +887,6 @@ class QInt {
             }
             return res;
         }
-
-        // // use this func to convert 4bits unsigned like: hex (1010(2) --> A(16))
-        // // only work with small number (4bits)
-        // int binToDec(string bitStr) {
-        //     int res = 0;
-        //     for (int i = bitStr.length() - 1; i >= 0; i--) {
-        //         res += (int)(bitStr[i] - 48) * pow(2, bitStr.length() - i - 1);
-        //     }
-        //     return res;
-        // }
 };
 
 
