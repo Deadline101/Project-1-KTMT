@@ -247,16 +247,53 @@ public:
 		string A;
 		A = Qint::setStringTo128bits(A);
 
-		int k = 128;
-		bool signQ = 0, signM = 0;
-		if (Q[0] == '1') {
-			signQ = 1;
+		bool signThuong = 0, signDu = 0;
+
+		if (Q[0] == '0' && M[0] == 0) {
+			if (Q < M) {
+				cout << "Thuong: 0" << endl;
+				cout << "Du: " << Qint::StringBinToStringDec(Q) << endl;
+				return Qint::setStringTo128bits("");
+			}
+		}
+		else if (Q[0] == '1' && M[0] == '1') {
 			Q = Qint::Offset2(Q);
-		}
-		if (A[0] == '1') {
-			signM = 1;
 			M = Qint::Offset2(M);
+			if (Q < M) {
+				cout << "Thuong: 0" << endl;
+				cout << "Du: " << Qint::StringBinToStringDec(Qint::Offset2(Q)) << endl;
+				return Qint::setStringTo128bits("");
+			}
+			else {
+				signDu = 1;
+			}
 		}
+		else if (Q[0] == '1' && M[0] == '0') {
+			Q = Qint::Offset2(Q);
+			if (Q < M) {
+				cout << "Thuong: 0" << endl;
+				cout << "Du: " << Qint::StringBinToStringDec(Qint::Offset2(Q)) << endl;
+				return Qint::setStringTo128bits("");
+			}
+			else {
+				signThuong = 1;
+				signDu = 1;
+			}
+		}
+		else if (Q[0] == '0' && M[0] == '1') {
+			M = Qint::Offset2(M);
+			if (Q < M) {
+				cout << "Thuong: 0" << endl;
+				cout << "Du: " << Qint::StringBinToStringDec(Q) << endl;
+				return Qint::setStringTo128bits("");
+			}
+			else {
+				signThuong = 1;
+			}
+		}
+
+		int k = 128;
+
 		while (k > 0) {
 			A.erase(A.begin());
 			A.insert(A.end(), Q[0]);
@@ -272,8 +309,11 @@ public:
 			}
 			--k;
 		}
-		if (signQ != signM) {
+		if (signThuong) {
 			Q = Qint::Offset2(Q);
+		}
+		if (signDu) {
+			A = Qint::Offset2(A);
 		}
 		cout << "Thuong: " << Qint::StringBinToStringDec(Q) << endl;
 		cout << "Du: " << Qint::StringBinToStringDec(A) << endl;
@@ -955,14 +995,9 @@ void launch()
 
 int main(int argc, char** argv)
 {
-	/*while (true) {
-		launch();
-	}
-*/
-	Qint qint1("-170141183460469231731687303715884105728"), qint2("1");
-	Qint qint3 = qint1 * qint2;
-	qint1.printQInt();
-	qint2.printQInt();
+	Qint qint1("-10")
+		, qint2("3");
+	Qint qint3 = qint1 / qint2;
 	qint3.printQInt();
 	return 0;
 }
