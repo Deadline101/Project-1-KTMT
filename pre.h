@@ -10,13 +10,21 @@ using namespace std;
 #include "string"
 #include "math.h"
 
-// viết code thì include file này vào,, 
-// add thư viện vào đây nhá :)) 
-// chỉ add những thư viện do c/c++ hỗ trợ vào đây thoi,, 
-
 enum ERROR {
     OUT_OF_RANGE,
     WRONG_FORMAT
 };
+
+void catchError(ERROR e) {
+    switch (e) {
+        case OUT_OF_RANGE: {
+            cout << "Data out of range\n";
+        } break;
+
+        case WRONG_FORMAT: {
+            cout << "Wrong format\n";
+        } break;
+    }
+}
 
 #endif
