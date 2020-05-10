@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 #include <iostream>
 using namespace std;
 #include <string>
@@ -251,7 +249,7 @@ public:
 
 		bool signThuong = 0, signDu = 0;
 
-		if (Q[0] == '0' && M[0] == 0) {
+		if (Q[0] == '0' && M[0] == '0') {
 			if (Q < M) {
 				cout << "Thuong: 0" << endl;
 				cout << "Du: " << Qint::StringBinToStringDec(Q) << endl;
@@ -704,6 +702,132 @@ public:
 	void DecToHex() {
 		this->DecToHex(*this);
 	}
+	static bool SoSanhBang (string stringbin1, string stringbin2) {
+		if (stringbin1 == stringbin2) {
+			return true;
+		}
+		return false;
+	}
+	static bool SoSanhKhac(string stringbin1, string stringbin2) {
+		if (!SoSanhBang(stringbin1, stringbin2)) {
+			return true;
+		}
+		return false;
+	}
+	static bool SoSanhBeHonHoacBang(string stringbin1, string stringbin2) {
+		if (Qint::SoSanhBang(stringbin1, stringbin2)) {
+			return true;
+		}
+		if (stringbin1[0] == '0' && stringbin2[0] == '1') {
+			return false;
+		}
+		else if (stringbin1[0] == '1' && stringbin2[0] == '0') {
+			return true;
+		}
+		else {
+			if (stringbin1 < stringbin2) {
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+	static bool SoSanhLonHonHoacBang(string stringbin1, string stringbin2) {
+		if (Qint::SoSanhBang(stringbin1, stringbin2)) {
+			return true;
+		}
+		if (stringbin1[0] == '0' && stringbin2[0] == '1') {
+			return true;
+		}
+		else if (stringbin1[0] == '1' && stringbin2[0] == '0') {
+			return false;
+		}
+		else {
+			if (stringbin1 > stringbin2) {
+				return true;
+			}
+			return false;
+		}
+		return false;
+	}
+	static bool SoSanhBeHon(string stringbin1, string stringbin2) {
+		if (!Qint::SoSanhLonHonHoacBang(stringbin1, stringbin2)) {
+			return true;
+		}
+		return false;
+	}
+	static bool SoSanhLonHon(string stringbin1, string stringbin2) {
+		if (!Qint::SoSanhBeHonHoacBang(stringbin1, stringbin2)) {
+			return true;
+		}
+		return false;
+	}
+	static string And2ChuoiNhiPhan(string stringbin1, string stringbin2) {
+		string newStringBin;
+		for (int i = 0; i < 128; ++i) {
+			if (stringbin1[i] == '1' && stringbin2[i] == '1') {
+				newStringBin = newStringBin + '1';
+				continue;
+			}
+			newStringBin = newStringBin + '0';
+		}
+		return newStringBin;
+	}
+	static string Or2ChuoiNhiPhan(string stringbin1, string stringbin2) {
+		string newStringBin;
+		for (int i = 0; i < 128; ++i) {
+			if (stringbin1[i] == '1' | stringbin2[i] == '1') {
+				newStringBin = newStringBin + '1';
+				continue;
+			}
+			newStringBin = newStringBin + '0';
+		}
+		return newStringBin;
+	}
+	static string Xor2ChuoiNhiPhan(string stringbin1, string stringbin2) {
+		string newStringBin;
+		for (int i = 0; i < 128; ++i) {
+			if (stringbin1[i] != stringbin2[i]) {
+				newStringBin = newStringBin + '1';
+				continue;
+			}
+			newStringBin = newStringBin + '0';
+		}
+		return newStringBin;
+	}
+	static string NotChuoiNhiPhan(string stringbin) {
+		string newStringBin = stringbin;
+		for (int i = 0; i < 128; ++i) {
+			if (newStringBin[i] == '0') {
+				newStringBin[i] = '1';
+				continue;
+			}
+			newStringBin[i] = '0';
+		}
+		return newStringBin;
+	}
+	static string DichTraiChuoiNhiPhan(string stringbin, int n) {
+		string newStringBin;
+		newStringBin = stringbin.substr(n, 128 - n);
+		int length = newStringBin.size();
+		for (int i = 0; i < n; ++i) {
+			newStringBin = newStringBin + '0';
+		}
+		return newStringBin;
+	}
+	static string DichPhaiChuoiNhiPhan(string stringbin, int n) {
+		string newStringBin;
+		newStringBin = stringbin.substr(0, 128 - n);
+		if (newStringBin[0] == '1') {
+			for (int i = 0; i < n; ++i) {
+				newStringBin = '1' + newStringBin;
+			}
+		}
+		else {
+			newStringBin = Qint::setStringTo128bits(newStringBin);
+		}
+		return newStringBin;
+	}
 	Qint operator +(Qint & const qint) {
 		string newStringBin;
 		newStringBin = this->Cong2DayBit(this->StringBin(), qint.StringBin());
@@ -724,140 +848,64 @@ public:
 		return Qint(newStringBin, 1);
 	}
 	bool operator ==(Qint & const qint) {
-		if (this->StringBin() == qint.StringBin()) {
+		if (Qint::SoSanhBang(this->StringBin(), qint.StringBin())) {
 			return true;
 		}
 		return false;
 	}
 	bool operator !=(Qint & const qint) {
-		if (*this == qint) {
-			return false;
+		if (Qint::SoSanhKhac(this->StringBin(), qint.StringBin())) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 	bool operator <=(Qint & const qint) {
-		if (*this == qint) {
+		if (Qint::SoSanhBeHonHoacBang(this->StringBin(), qint.StringBin())) {
 			return true;
 		}
-		string a = this->StringBin(), b = qint.StringBin();
-		if (a[0] == '0' && b[0] == '1') {
-			return false;
-		}
-		else if (a[0] == '1' && b[0] == '0') {
-			return true;
-		}
-		else {
-			if (a < b) {
-				return true;
-			}
-			return false;
-		}
+		return false;
 	}
 	bool operator >=(Qint & const qint) {
-		if (*this == qint) {
+		if (Qint::SoSanhLonHonHoacBang(this->StringBin(), qint.StringBin())) {
 			return true;
 		}
-		string a = this->StringBin(), b = qint.StringBin();
-		if (a[0] == '0' && b[0] == '1') {
-			return true;
-		}
-		else if (a[0] == '1' && b[0] == '0') {
-			return false;
-		}
-		else {
-			if (a > b) {
-				return true;
-			}
-			return false;
-		}
+		return false;
 	}
 	bool operator >(Qint & const qint) {
-		if (*this <= qint) {
-			return false;
+		if (!Qint::SoSanhBeHonHoacBang(this->StringBin(), qint.StringBin())) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 	bool operator <(Qint & const qint) {
-		if (*this >= qint) {
-			return false;
+		if (!Qint::SoSanhLonHonHoacBang(this->StringBin(), qint.StringBin())) {
+			return true;
 		}
-		return true;
+		return false;
 	}
-	Qint & operator &(Qint &const qint) {
-		string newStringBin;
-		string a = this->StringBin(), b = qint.StringBin();
-		for (int i = 0; i < 128; ++i) {
-			if (a[i] == '1' && b[i] == '1') {
-				newStringBin = newStringBin + '1';
-				continue;
-			}
-			newStringBin = newStringBin + '0';
-		}
-		this->modifireStringBin(newStringBin);
-		return *this;
+	Qint operator &(Qint &const qint) {
+		string newStringBin = Qint::And2ChuoiNhiPhan(this->StringBin(), qint.StringBin());
+		return Qint(newStringBin, 1);
 	}
-	Qint & operator |(Qint &const qint) {
-		string newStringBin;
-		string a = this->StringBin(), b = qint.StringBin();
-		for (int i = 0; i < 128; ++i) {
-			if (a[i] == '1' | b[i] == '1') {
-				newStringBin = newStringBin + '1';
-				continue;
-			}
-			newStringBin = newStringBin + '0';
-		}
-		this->modifireStringBin(newStringBin);
-		return *this;
+	Qint operator |(Qint &const qint) {
+		string newStringBin = Qint::Or2ChuoiNhiPhan(this->StringBin(), qint.StringBin());
+		return Qint(newStringBin, 1);
 	}
-	Qint & operator ^(Qint &const qint) {
-		string newStringBin;
-		string a = this->StringBin(), b = qint.StringBin();
-		for (int i = 0; i < 128; ++i) {
-			if (a[i] != b[i]) {
-				newStringBin = newStringBin + '1';
-				continue;
-			}
-			newStringBin = newStringBin + '0';
-		}
-		this->modifireStringBin(newStringBin);
-		return *this;
+	Qint operator ^(Qint &const qint) {
+		string newStringBin = Qint::Xor2ChuoiNhiPhan(this->StringBin(), qint.StringBin());
+		return Qint(newStringBin, 1);
 	}
-	Qint & operator ~() {
-		string newStringBin = this->StringBin();
-		for (int i = 0; i < 128; ++i) {
-			if (newStringBin[i] == '0') {
-				newStringBin[i] = '1';
-				continue;
-			}
-			newStringBin[i] = '0';
-		}
-		this->modifireStringBin(newStringBin);
-		return *this;
+	Qint operator ~() {
+		string newStringBin = Qint::NotChuoiNhiPhan(this->StringBin());
+		return Qint(newStringBin, 1);
 	}
-	Qint & operator <<(int n) {
-		string a = this->StringBin();
-		a = a.substr(n, 128 - n);
-		int length = a.size();
-		for (int i = 0; i < length; ++i) {
-			a = a + '0';
-		}
-		this->modifireStringBin(a);
-		return *this;
+	Qint operator <<(int n) {
+		string newStringBin = Qint::DichTraiChuoiNhiPhan(this->StringBin(), n);
+		return Qint(newStringBin, 1);
 	}
-	Qint & operator >>(int n) {
-		string a = this->StringBin();
-		a = a.substr(0, 128 - n);
-		if (a[0] == '1') {
-			for (int i = 0; i < n; ++i) {
-				a = '1' + a;
-			}
-		}
-		else {
-			a = Qint::setStringTo128bits(a);
-		}
-		
-		this->modifireStringBin(a);
-		return *this;
+	Qint operator >>(int n) {
+		string newStringBin = Qint::DichPhaiChuoiNhiPhan(this->StringBin(), n);
+		return Qint(newStringBin, 1);
 	}
 };
 
@@ -997,10 +1045,10 @@ void launch()
 
 int main(int argc, char** argv)
 {
-	Qint qint1("-10")
-		, qint2("3");
-	Qint qint3 = qint1 / qint2;
+	Qint qint1("-10"), qint2("7");
+	Qint qint3 = qint1 << 3;
+	qint1.printQInt();
+	qint2.printQInt();
 	qint3.printQInt();
 	return 0;
 }
->>>>>>> 81c0c6c81ec94e950db5abda673dd6ffc621cd23
