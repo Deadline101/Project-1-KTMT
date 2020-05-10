@@ -161,8 +161,13 @@ class QInt {
 	}
 */
         QInt operator+(QInt q) {
-            // recall optAdd(QInt, QInt): return QInt
-            return optAdd(*this, q);
+            try {
+                // recall optAdd(QInt, QInt): return QInt
+                return optAdd(*this, q);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
         }
 
 /*  * operator-, written by TheMinh, reWrite by BaoLong
@@ -177,7 +182,8 @@ class QInt {
             // create a two'2 complement number
             QInt temp;
             temp = "1";
-            temp = temp + ~q;
+            // temp = temp + ~q;
+            temp = optAdd(temp, ~q);
 
             // return *this + that two'2 complement number (using operator +)
             return *this + temp;
@@ -193,12 +199,27 @@ class QInt {
 */
         // operator *
         QInt operator*(QInt q) {
-            return optMultiply(*this, q);
+            try {
+                return optMultiply(*this, q);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
         }
-
-// QInt operator /(QInt & const qint) {
-    
-// }
+/*
+    Qint operator /(Qint & const qint) {
+        string newStringBin = Qint::Chia2Daybit(this->StringBin(), qint.StringBin());
+        return Qint(newStringBin, 1);
+    }
+*/
+        QInt operator/(QInt q) {
+            try {
+                return optDivide(*this, q);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
+        }
 
         // operator>>
         QInt operator>>(int n) {
@@ -270,6 +291,71 @@ class QInt {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        /*  divide: q1/q2
+            input: 2 QInt
+            output: QInt res 
+        */
+        QInt optDivide(QInt q1, QInt q2) {
+            QInt zero;
+            zero = "0";
+            if (q2 == zero) {
+                throw DIVIDE_BY_ZERO;
+            }
+            bool s1 = false, s2 = false;
+            if (getBitAt(0, q1) == 1) {
+                s1 = true;
+                QInt temp;
+                temp = "1";
+                // q1 = ~q1 + temp;
+                q1 = optAdd(~q1, temp);
+            }
+            if (getBitAt(0, q2) == 1) {
+                s2 = true;
+                // QInt temp; 
+                // temp = "1";
+                // q2 = ~q2 + temp;
+                // q2 = optAdd(~q2, temp, true);
+            }
+
+            string str1 = DecToBin(q1);
+            string str2 = DecToBin(q2);
+            string res = divideTwoString(str1, str2, s1, s2);
+            return BinToDec(res);
+        }
+
+        /*  divide by 2 signed string (binary)
+            input: 2 positive string, 2 signed of these strings
+            output: bit string res (signed)
+        */
+        string divideTwoString(string Q, string M, bool s1, bool s2) {
+            string A = (new QInt())->DecToBin(*(new QInt()));
+            int k = 128;
+            while (k > 0) {
+                A.erase(A.begin());
+                A.insert(A.end(), Q[0]);
+                Q.erase(Q.begin());
+                Q.insert(Q.end(), '0');
+                A = DecToBin(optAdd(BinToDec(A), BinToDec(M)));
+                // A = DecToBin(BinToDec(A) + BinToDec(M));
+                if (A[0] == '1') {
+                    A[Q.length() - 1] = '0';
+                    // A = DecToBin((BinToDec(A) + BinToDec(M)));
+                    A = DecToBin(optAdd(BinToDec(A), BinToDec(M)));
+                }
+                else {
+                    Q[Q.length() - 1] = '1';
+                }
+                k--;
+            }
+            if ((s1 == true && s2 == false) || (s1 == false && s2 == true)) {
+                QInt temp;
+                temp = "1";
+                Q = DecToBin(optAdd(~BinToDec(Q), temp));
+                // Q = DecToBin(~BinToDec(Q) + temp);
+            }
+            return Q;
+        }
+
         /*  multiply 2 QInt
             input: 2 QInt
             output: QInt (res)
@@ -280,19 +366,98 @@ class QInt {
                 s1 = true;
                 QInt temp;
                 temp = "1";
-                q1 = ~q1 + temp;
+                // q1 = ~q1 + temp;
+                q1 = optAdd(~q1, temp);
             }
             if (getBitAt(0, q2) == 1) {
                 s2 = true;
-                QInt temp;
+                QInt temp; 
                 temp = "1";
-                q2 = ~q2 + temp;
+                // q2 = ~q2 + temp;
+                q2 = optAdd(~q2, temp);
             }
 
             string str1 = DecToBin(q1);
             string str2 = DecToBin(q2);
+            string res = multiplyTwoString(str1, str2, s1, s2);
+
+            string testRange = convertBinaryStringToDecimalString(res);
+            if (inputOutOfRange(testRange)) {
+                throw OUT_OF_RANGE;
+            }
+
+            res = res.substr(129, 128);
+            return BinToDec(res);
+        }
+
+        // input: signed bit string
+        // output: signed decimal string
+        string convertBinaryStringToDecimalString (string bit) {
+            bool s = false;
+            if (bit[0] == '1') {
+                s = true;
+                // bit = ~bit
+                for (int i = 0; i < bit.length(); i++) {
+                    if (bit[i] == '1') {
+                        bit[i] = '0';
+                    }
+                    else {
+                        bit[i] = '1';
+                    }
+                }
+
+                // bit = bit + 1
+                int temp1 = 0;
+                int temp2 = 1;  // suppose 1 is remainder
+                for (int i = bit.length() - 1; i >= 0; i--) {
+                    temp1 = (int)(bit[i] - 48) + 0 + temp2;
+                    if (temp1 == 2) {
+                        // res[i] = '0';
+                        // setBit(i, 0, res);
+                        bit[i] = '0';
+                        temp2 = 1;
+                    }
+                    else if (temp1 == 0) {
+                        // res[i] = '0';
+                        // setBit(i, 0, res);
+                        bit[i] = '0';
+                        temp2 = 0;
+                    }
+                    else if (temp1 == 1){
+                        // res[i] = '1';
+                        // setBit(i, 1, res);
+                        bit[i] = '1';
+                        temp2 = 0;
+                    }
+                    else if (temp1 == 3) {
+                        // res[i] = '1';
+                        // setBit(i, 1, res);
+                        bit[i] = '1';
+                        temp2 = 1;
+                    }
+                }
+            }
+
             string res = "";
-            res = str2;
+            for (int i = bit.length() - 1; i >= 0; i--) {
+                if (bit[i] != '0') {
+                    res = findSum(res, power("2", to_string(bit.length() - 1 - i)));
+                }
+            }
+            if (s) {
+                res = res.insert(0, "-");
+            }
+
+            return res == "" ? "0" : res;
+        }
+
+        /*  multiply 2 positive string (binary)
+            input: 2 positive string, 2 signed of these strings
+            output: bit string res (signed)
+        */
+        string multiplyTwoString(string bit1, string bit2, bool s1, bool s2) {
+            string res = "";
+            res = bit2;
             for (int i = 0; i < 129; i++) {
                 res = '0' + res;
             }
@@ -302,27 +467,58 @@ class QInt {
                 if (res[256] == '1') {
                     m = res.substr(1, 128);
                     q = res.substr(129, 128);
-                    m = DecToBin(BinToDec(m) + BinToDec(str1));
+                    m = DecToBin(optAdd(BinToDec(m), BinToDec(bit1)));
                     res = '0' + m + q;
                 }
                 res.erase(res.end() - 1);
                 res.insert(res.begin(), '0');
                 k--;
             }
-            res = res.substr(129, 128);
-            if ((s1 == false && s2 == true) || (s1 == true && s2 == false)) {
-                QInt temp;
-                temp = "1";
-                res = DecToBin(~BinToDec(res) + temp);
-            }
-            return BinToDec(res);
-        }
+            // res = res.substr(129, 128);
+            if ((s1 == true && s2 == false) || (s1 == false && s2 == true)) {
+                // bit = ~bit
+                for (int i = 0; i < res.length(); i++) {
+                    if (res[i] == '1') {
+                        res[i] = '0';
+                    }
+                    else {
+                        res[i] = '1';
+                    }
+                }
 
-        /*  divide 2 QInt
-            input: 2QInt
-            output: QInt (res)
-        */
-        // QInt optDivide(QInt)
+                // bit = bit + 1
+                int temp1 = 0;
+                int temp2 = 1;  // suppose 1 is remainder
+                for (int i = res.length() - 1; i >= 0; i--) {
+                    temp1 = (int)(res[i] - 48) + 0 + temp2;
+                    if (temp1 == 2) {
+                        // res[i] = '0';
+                        // setBit(i, 0, res);
+                        res[i] = '0';
+                        temp2 = 1;
+                    }
+                    else if (temp1 == 0) {
+                        // res[i] = '0';
+                        // setBit(i, 0, res);
+                        res[i] = '0';
+                        temp2 = 0;
+                    }
+                    else if (temp1 == 1){
+                        // res[i] = '1';
+                        // setBit(i, 1, res);
+                        res[i] = '1';
+                        temp2 = 0;
+                    }
+                    else if (temp1 == 3) {
+                        // res[i] = '1';
+                        // setBit(i, 1, res);
+                        res[i] = '1';
+                        temp2 = 1;
+                    }
+                }
+            }
+            return res;
+        }
 
         /*  opt <<
             input: QInt, n
@@ -483,18 +679,21 @@ class QInt {
         string PrintQInt(QInt q) {
             string str = "0";
             QInt temp = q;
+            // convert to positive number for calculating
             if (getBitAt(0, temp) == 1) {
                 QInt one;
                 one = "1";
                 temp = optAdd(optNot(temp), one);
             }
 
+            // calculating
             for (int i = 127; i >= 0; i--) {
                 if (getBitAt(i, temp) != 0) {
                     str = findSum(str, power("2", to_string(128 - 1 - i)));
                 }
             }
 
+            // and signed 
             if (getBitAt(0, q) == 1) {
                 str = str.insert(0, "-");
             }
@@ -505,7 +704,6 @@ class QInt {
             if (!checkSpelling(str)) {
                 throw WRONG_FORMAT;
             }
-            // outOfRange hasn't been written yet
             if (inputOutOfRange(str)) {
                 throw OUT_OF_RANGE;
             }
@@ -602,10 +800,6 @@ class QInt {
                     temp2 = 1;
                 }
             }
-            // if positive + positive = negative or negative + negative = positive
-            if ((getBitAt(0, q1) == 1 && getBitAt(0, q2) == 1 && getBitAt(0, res) == 0) || (getBitAt(0, q1) == 0 && getBitAt(0, q2) == 0 && getBitAt(0, res) == 1)) {
-                throw OUT_OF_RANGE;
-            }
             return res;
         }
 
@@ -651,6 +845,8 @@ class QInt {
             return true;
         }
 
+        // str: unsigned decimal
+        // res stands for result :))
         void divideByTwo(string str, string &res) {
             if (str.length() == 1 && str[0] < '2') {
                 return;
@@ -673,6 +869,7 @@ class QInt {
             }
         }
 
+        // check if str (signed decimal) is out of range or not
         bool inputOutOfRange(string str) {
             string min = MIN_QINT, max = MAX_QINT;
 
