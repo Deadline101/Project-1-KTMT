@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 #include <iostream>
 using namespace std;
 #include <string>
@@ -251,7 +249,7 @@ public:
 
 		bool signThuong = 0, signDu = 0;
 
-		if (Q[0] == '0' && M[0] == 0) {
+		if (Q[0] == '0' && M[0] == '0') {
 			if (Q < M) {
 				cout << "Thuong: 0" << endl;
 				cout << "Du: " << Qint::StringBinToStringDec(Q) << endl;
