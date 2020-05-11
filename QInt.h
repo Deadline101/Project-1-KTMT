@@ -163,7 +163,7 @@ class QInt {
         QInt operator+(QInt q) {
             try {
                 // recall optAdd(QInt, QInt): return QInt
-                return optAdd(*this, q);
+                return optAdd(*this, q, false);
             }
             catch (ERROR e) {
                 catchError(e);
@@ -179,14 +179,24 @@ class QInt {
 	}
 */
         QInt operator-(QInt q) {
-            // create a two'2 complement number
-            QInt temp;
-            temp = "1";
-            // temp = temp + ~q;
-            temp = optAdd(temp, ~q);
+            // // create a two'2 complement number
+            // QInt temp = convertToTwoComplement(q);
+            // // QInt temp;
+            // // temp = "1";
+            // // // temp = temp + ~q;
+            // // temp = optAdd(temp, ~q);
 
-            // return *this + that two'2 complement number (using operator +)
-            return *this + temp;
+            // // return *this + that two'2 complement number (using operator +)
+            // return *this + temp;
+            if (*this == q) {
+                return *(new QInt());
+            }
+            try {
+                return optSub(*this, q, false);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
         }
 
 /*  * operator *
@@ -291,6 +301,32 @@ class QInt {
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        QInt optSub(QInt q1, QInt q2, bool mys) {
+            QInt temp = convertToTwoComplement(q2);
+            return optAdd(q1, temp, mys);
+        }
+
+        bool isMin(QInt q) {
+            if (getBitAt(0, q) == 1) {
+                for (int i = 1; i < 128; i++) {
+                    if (getBitAt(i, q) != 0) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        QInt convertToTwoComplement(QInt q) {
+            if (isMin(q)) {
+                return q;
+            }
+            QInt temp;
+            temp = "1";
+            return optAdd(temp, ~q, false);
+        }
+
         /*  divide: q1/q2
             input: 2 QInt
             output: QInt res 
@@ -304,22 +340,30 @@ class QInt {
             bool s1 = false, s2 = false;
             if (getBitAt(0, q1) == 1) {
                 s1 = true;
-                QInt temp;
-                temp = "1";
-                // q1 = ~q1 + temp;
-                q1 = optAdd(~q1, temp);
+                // QInt temp;
+                // temp = "1";
+                // // q1 = ~q1 + temp;
+                // q1 = optAdd(~q1, temp);
+                q1 = convertToTwoComplement(q1);
             }
             if (getBitAt(0, q2) == 1) {
                 s2 = true;
                 // QInt temp; 
                 // temp = "1";
-                // q2 = ~q2 + temp;
-                // q2 = optAdd(~q2, temp, true);
+                // // q2 = ~q2 + temp;
+                // q2 = optAdd(~q2, temp);
+                q2 = convertToTwoComplement(q2);
             }
 
             string str1 = DecToBin(q1);
             string str2 = DecToBin(q2);
             string res = divideTwoString(str1, str2, s1, s2);
+
+            string testRange = convertBinaryStringToDecimalString(res);
+            if (inputOutOfRange(testRange)) {
+                throw OUT_OF_RANGE;
+            }
+
             return BinToDec(res);
         }
 
@@ -335,23 +379,37 @@ class QInt {
                 A.insert(A.end(), Q[0]);
                 Q.erase(Q.begin());
                 Q.insert(Q.end(), '0');
-                A = DecToBin(optAdd(BinToDec(A), BinToDec(M)));
-                // A = DecToBin(BinToDec(A) + BinToDec(M));
+                // A = DecToBin(optAdd(BinToDec(A), BinToDec(M)));
+                // A = DecToBin(BinToDec(A) - BinToDec(M));
+                A = DecToBin(optSub(BinToDec(A), BinToDec(M), true));
                 if (A[0] == '1') {
-                    A[Q.length() - 1] = '0';
+                    Q[Q.length() - 1] = '0';
                     // A = DecToBin((BinToDec(A) + BinToDec(M)));
-                    A = DecToBin(optAdd(BinToDec(A), BinToDec(M)));
+                    A = DecToBin(optAdd(BinToDec(A), BinToDec(M), true));
                 }
                 else {
                     Q[Q.length() - 1] = '1';
                 }
                 k--;
             }
-            if ((s1 == true && s2 == false) || (s1 == false && s2 == true)) {
-                QInt temp;
-                temp = "1";
-                Q = DecToBin(optAdd(~BinToDec(Q), temp));
+
+            // Q[128] -> Q[129] (bit 0 is for signal)
+            if (isMin(BinToDec(Q))) {
+                if (s1 != s2) {
+                    Q = Q.insert(0, "1");
+                }
+                else {
+                    Q = Q.insert(0, "0");
+                }
+                return Q;
+            }
+
+            if (s1 != s2) {
+                // QInt temp;
+                // temp = "1";
+                // Q = DecToBin(optAdd(~BinToDec(Q), temp));
                 // Q = DecToBin(~BinToDec(Q) + temp);
+                Q = DecToBin(convertToTwoComplement(BinToDec(Q)));
             }
             return Q;
         }
@@ -364,17 +422,19 @@ class QInt {
             bool s1 = false, s2 = false;
             if (getBitAt(0, q1) == 1) {
                 s1 = true;
-                QInt temp;
-                temp = "1";
-                // q1 = ~q1 + temp;
-                q1 = optAdd(~q1, temp);
+                // QInt temp;
+                // temp = "1";
+                // // q1 = ~q1 + temp;
+                // q1 = optAdd(~q1, temp);
+                q1 = convertToTwoComplement(q1);
             }
             if (getBitAt(0, q2) == 1) {
                 s2 = true;
-                QInt temp; 
-                temp = "1";
-                // q2 = ~q2 + temp;
-                q2 = optAdd(~q2, temp);
+                // QInt temp; 
+                // temp = "1";
+                // // q2 = ~q2 + temp;
+                // q2 = optAdd(~q2, temp);
+                q2 = convertToTwoComplement(q2);
             }
 
             string str1 = DecToBin(q1);
@@ -467,7 +527,7 @@ class QInt {
                 if (res[256] == '1') {
                     m = res.substr(1, 128);
                     q = res.substr(129, 128);
-                    m = DecToBin(optAdd(BinToDec(m), BinToDec(bit1)));
+                    m = DecToBin(optAdd(BinToDec(m), BinToDec(bit1), true));
                     res = '0' + m + q;
                 }
                 res.erase(res.end() - 1);
@@ -475,7 +535,7 @@ class QInt {
                 k--;
             }
             // res = res.substr(129, 128);
-            if ((s1 == true && s2 == false) || (s1 == false && s2 == true)) {
+            if (s1 != s2) {
                 // bit = ~bit
                 for (int i = 0; i < res.length(); i++) {
                     if (res[i] == '1') {
@@ -681,9 +741,7 @@ class QInt {
             QInt temp = q;
             // convert to positive number for calculating
             if (getBitAt(0, temp) == 1) {
-                QInt one;
-                one = "1";
-                temp = optAdd(optNot(temp), one);
+                temp = convertToTwoComplement(temp);
             }
 
             // calculating
@@ -715,10 +773,7 @@ class QInt {
             } 
             setBitSequence(str, q); 
             if (sign) {
-                q = optNot(q);
-                QInt temp;
-                ScanQInt(temp, "1");
-                q = optAdd(q, temp);
+                q = convertToTwoComplement(q);
             }
         }
 
@@ -771,7 +826,7 @@ class QInt {
         }
 
         // operator + (QInt + QInt)
-        QInt optAdd(QInt q1, QInt q2) {
+        QInt optAdd(QInt q1, QInt q2, bool mys) {
             QInt res;
 
             int temp1 = 0;   
@@ -799,6 +854,13 @@ class QInt {
                     setBit(i, 1, res);
                     temp2 = 1;
                 }
+            }
+
+            if (mys) {
+                return res;
+            }
+            if (getBitAt(0, q1) == getBitAt(0, q2) && getBitAt(0, q1) != getBitAt(0, res)) {
+                throw OUT_OF_RANGE;
             }
             return res;
         }
