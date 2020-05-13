@@ -8,7 +8,92 @@
 
 class QInt {
     public:
-        // input
+
+        // use to handle file
+        // dont have to care about this function
+        void mScanQInt(string str) {
+            try {
+                ScanQInt(*this, str);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
+        }
+
+        // use to handle file
+        // dont have to care about this function
+        string mDecToBin(string str) {
+            try {
+                ScanQInt(*this, str);
+                return DecToBin(*this);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
+        }
+
+        // use to handle file
+        // dont have to care about this function
+        string mBinToDec(string str) {
+            try {
+                mScanBin(str);
+                // return (DecToBin(*this));
+                return PrintQInt(*this);
+            }
+            catch(ERROR e) {
+                catchError(e);
+            }
+        }
+
+        // use to handle file
+        // dont have to care about this function
+        void mScanBin(string str) {
+            try {
+                *this = BinToDec(str);
+            }
+            catch(ERROR e) {
+                catchError(e);
+            }
+        }
+
+        // use to handle file
+        // dont have to care about this function
+        string mBinToHex(string str) {
+            try {
+                return BinToHex(str);
+            }
+            catch(ERROR e) {
+                catchError(e);
+            }
+        }
+
+        // use to handle file
+        // dont have to care about this function
+        void mScanHex(string str) {
+            try {
+                ScanHex(str, *this);
+            }
+            catch(ERROR e) {
+                catchError(e);
+            }
+        }
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // dec to hex
+        // input: string (decimal)
+        // output: hexadecimal
+        string DecToHex(string str) {
+            try {
+                ScanQInt(*this, str);
+                return BinToHex(DecToBin(*this));
+            }
+            catch(ERROR e) {
+                catchError(e);
+            }
+        }
+
+        // input (decimal)
         void ScanQInt() {
             try {
                 cout << "Enter decimal: ";
@@ -21,7 +106,7 @@ class QInt {
             }
         }
 
-        // output
+        // output (decimal)
         void PrintQInt() {
             cout << "Output: "<< PrintQInt(*this) << endl;
         }
@@ -179,15 +264,6 @@ class QInt {
 	}
 */
         QInt operator-(QInt q) {
-            // // create a two'2 complement number
-            // QInt temp = convertToTwoComplement(q);
-            // // QInt temp;
-            // // temp = "1";
-            // // // temp = temp + ~q;
-            // // temp = optAdd(temp, ~q);
-
-            // // return *this + that two'2 complement number (using operator +)
-            // return *this + temp;
             if (*this == q) {
                 return *(new QInt());
             }
@@ -199,7 +275,7 @@ class QInt {
             }
         }
 
-/*  * operator *
+/*  * operator *, written by TheMinh, reWrite by BaoLong
 	QInt operator *(QInt & const qint) {
 		string multi = QInt::Nhan2Daybit(this->StringBin(), qint.StringBin());
 		string newStringBin = multi;
@@ -216,7 +292,8 @@ class QInt {
                 catchError(e);
             }
         }
-/*
+
+/*  operator /, written by TheMinh, reWrite by BaoLong
     Qint operator /(Qint & const qint) {
         string newStringBin = Qint::Chia2Daybit(this->StringBin(), qint.StringBin());
         return Qint(newStringBin, 1);
@@ -241,42 +318,14 @@ class QInt {
             return optShiftLeft(*this, n);
         }
 
-        // rol
-        QInt rol(QInt q, int n) {
-            QInt res = q;
-            string str = DecToBin(res);
-
-            int temp;
-            // temp = bit[0]
-            // delete bit[0] in bit string
-            // bit string += bit[0]
-            for (int i = 0; i < n; i++) {
-                temp = (int)(str[0] - 48);
-                str = str.substr(0);
-                str += to_string(temp);
-            }
-
-            res = BinToDec(str);
-            return res;
+        // operator ror
+        QInt ror(int n) {
+            return ror(*this, n);
         }
 
-        // ror
-        QInt ror(QInt q, int n) {
-            QInt res = q;
-            string str = DecToBin(res);
-
-            int temp;
-            // temp = bit[127]
-            // delete bit[127] in bit string
-            // insert bit[127] into bit string at pos 0
-            for (int i = 0; i < n; i++) {
-                temp = (int)(str[127] - 48);
-                str = str.substr(0, 127);
-                str.insert(0, to_string(temp));
-            }
-
-            res = BinToDec(str);
-            return res;
+        // operator rol
+        QInt rol(int n) {
+            return rol(*this, n);
         }
 
         // operator >
@@ -299,13 +348,156 @@ class QInt {
             return optGreaterThanOrEqual(*this, q);
         }
 
+        // scan hexadecimal
+        void ScanHex() {
+            try {
+                cout << "Enter hexadecimal: ";
+                string str;
+                getline(cin, str);
+                ScanHex(str, *this);
+            }
+            catch (ERROR e) {
+                catchError(e);
+            }
+        }
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        // 80000000000000000000000000000000
+        // 7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+        // scan hexadecimal
+        // input: string (hex), QInt
+        // output: void
+        void ScanHex(string str, QInt &q) {
+            string res = "";
+            for (int i = str.length() - 1; i >= 0; i--) {
+                switch (str[i]) {
+                    case '0': {
+                        res = res.insert(0, "0000");
+                    } break;
+
+                    case '1': {
+                        res = res.insert(0, "0001");
+                    } break;
+
+                    case '2': {
+                        res = res.insert(0, "0010");
+                    } break;
+
+                    case '3': {
+                        res = res.insert(0, "0011");
+                    } break;
+
+                    case '4': {
+                        res = res.insert(0, "0100");
+                    } break;
+
+                    case '5': {
+                        res = res.insert(0, "00101");
+                    } break;
+
+                    case '6': {
+                        res = res.insert(0, "0110");
+                    } break;
+
+                    case '7': {
+                        res = res.insert(0, "0111");
+                    } break;
+
+                    case '8': {
+                        res = res.insert(0, "1000");
+                    } break;
+
+                    case '9': {
+                        res = res.insert(0, "1001");
+                    } break;
+
+                    case 'A':
+                    case 'a': {
+                        res = res.insert(0, "1010");
+                    } break;
+
+                    case 'B':
+                    case 'b': {
+                        res = res.insert(0, "1011");
+                    } break;
+
+                    case 'C':
+                    case 'c': {
+                        res = res.insert(0, "1100");
+                    } break;
+
+                    case 'D':
+                    case 'd': {
+                        res = res.insert(0, "1101");
+                    } break;
+
+                    case 'E':
+                    case 'e': {
+                        res = res.insert(0, "1110");
+                    } break;
+
+                    case 'F':
+                    case 'f': {
+                        res = res.insert(0, "1111");
+                    } break;
+
+                }
+            }
+            q = BinToDec(res);
+        }
+
+        // rol
+        // input: QInt, n
+        // output: QInt (result)
+        QInt rol(QInt q, int n) {
+            QInt res = q;
+            string str = DecToBin(res);
+
+            int temp;
+            // temp = bit[0]
+            // delete bit[0] in bit string
+            // bit string += bit[0]
+            for (int i = 0; i < n; i++) {
+                temp = (int)(str[0] - 48);
+                str = str.substr(1);
+                str += to_string(temp);
+            }
+
+            res = BinToDec(str);
+            return res;
+        }
+
+        // ror
+        // input: QInt, n
+        // output: QInt (result)
+        QInt ror(QInt q, int n) {
+            QInt res = q;
+            string str = DecToBin(res);
+
+            int temp;
+            // temp = bit[127]
+            // delete bit[127] in bit string
+            // insert bit[127] into bit string at pos 0
+            for (int i = 0; i < n; i++) {
+                temp = (int)(str[127] - 48);
+                str = str.substr(0, 127);
+                str.insert(0, to_string(temp));
+            }
+
+            res = BinToDec(str);
+            return res;
+        }
+
+        // operator - (function): 
+        // input: 2 QInt
+        // bool mys: is explained in QInt optAdd(QInt q1, QInt q2, bool mys)
         QInt optSub(QInt q1, QInt q2, bool mys) {
             QInt temp = convertToTwoComplement(q2);
             return optAdd(q1, temp, mys);
         }
 
+        // if q is min 
         bool isMin(QInt q) {
             if (getBitAt(0, q) == 1) {
                 for (int i = 1; i < 128; i++) {
@@ -318,6 +510,7 @@ class QInt {
             return false;
         }
 
+        // pls read the name of the function
         QInt convertToTwoComplement(QInt q) {
             if (isMin(q)) {
                 return q;
@@ -327,10 +520,9 @@ class QInt {
             return optAdd(temp, ~q, false);
         }
 
-        /*  divide: q1/q2
-            input: 2 QInt
-            output: QInt res 
-        */
+        // divide: q1/q2
+        // input: 2 QInt
+        // output: QInt res 
         QInt optDivide(QInt q1, QInt q2) {
             QInt zero;
             zero = "0";
@@ -367,10 +559,9 @@ class QInt {
             return BinToDec(res);
         }
 
-        /*  divide by 2 signed string (binary)
-            input: 2 positive string, 2 signed of these strings
-            output: bit string res (signed)
-        */
+        // divide by 2 signed string (binary)
+        // input: 2 positive string, 2 signed of these strings
+        // output: bit string res (signed)
         string divideTwoString(string Q, string M, bool s1, bool s2) {
             string A = (new QInt())->DecToBin(*(new QInt()));
             int k = 128;
@@ -414,10 +605,9 @@ class QInt {
             return Q;
         }
 
-        /*  multiply 2 QInt
-            input: 2 QInt
-            output: QInt (res)
-        */
+        // multiply 2 QInt
+        // input: 2 QInt
+        // output: QInt (res)
         QInt optMultiply(QInt q1, QInt q2) {
             bool s1 = false, s2 = false;
             if (getBitAt(0, q1) == 1) {
@@ -511,10 +701,9 @@ class QInt {
             return res == "" ? "0" : res;
         }
 
-        /*  multiply 2 positive string (binary)
-            input: 2 positive string, 2 signed of these strings
-            output: bit string res (signed)
-        */
+        // multiply 2 positive string (binary)
+        // input: 2 positive string, 2 signed of these strings
+        // output: bit string res (signed)
         string multiplyTwoString(string bit1, string bit2, bool s1, bool s2) {
             string res = "";
             res = bit2;
@@ -580,10 +769,9 @@ class QInt {
             return res;
         }
 
-        /*  opt <<
-            input: QInt, n
-            output: QInt (res)
-        */
+        // opt <<
+        // input: QInt, n
+        // output: QInt (res)
         QInt optShiftLeft(QInt q1, int n) {
             string str = DecToBin(q1);
             str = str.substr(n);
@@ -596,10 +784,9 @@ class QInt {
             return q;
         }
 
-        /*  opt >>
-            input: QInt, n
-            output: QInt (res)
-        */
+        // opt >>
+        // input: QInt, n
+        // output: QInt (res)
         QInt optShiftRight(QInt q1, int n) {
             string str = DecToBin(q1);
             str = str.substr(0, str.length() - n);
@@ -619,10 +806,9 @@ class QInt {
             return q;
         }
 
-        /*  bin to hex 
-            input: bit string
-            output: string (hexadecimal)
-        */
+        // bin to hex 
+        // input: bit string
+        // output: string (hexadecimal)
         string BinToHex(string bit) {
             while (bit[0] == '0') {
                 bit = bit.substr(1);
@@ -696,19 +882,19 @@ class QInt {
             return true;
         }
 
-        /*  bin to dec
-            input: bit (unchecked)
-            output: QInt (just setbit into QInt)
-        */
+        // bin to dec
+        // input: bit (unchecked)
+        // output: QInt (just setbit into QInt)
         QInt BinToDec(string bit) {
-            while (bit[0] == '0') { // bit = "00000001" -> bit = "1"
-                bit = bit.substr(1);
-            }
-            if (!checkSpellingBitString(bit)) {
-                throw WRONG_FORMAT;
+            while (bit.length() < 128) { 
+                // bit = bit.substr(1);
+                bit = bit.insert(0, "0");
             }
             if (bit.length() > 128) {
                 throw OUT_OF_RANGE;
+            }
+            if (!checkSpellingBitString(bit)) {
+                throw WRONG_FORMAT;
             }
 
             QInt q;
@@ -720,10 +906,9 @@ class QInt {
             return q;
         }
 
-        /*  dec to bin
-            input: QInt (input from keyboard)
-            output: string (binary)
-        */
+        // dec to bin
+        // input: QInt (input from keyboard)
+        // output: string (binary)
         string DecToBin(QInt x) {
             string str;
             for (int i = 0; i < 128; i++) {
@@ -732,10 +917,9 @@ class QInt {
             return str;
         }
 
-        /*  printQInt
-            input: QInt
-            output: string (decimal)
-        */
+        // printQInt
+        // input: QInt
+        // output: string (decimal)
         string PrintQInt(QInt q) {
             string str = "0";
             QInt temp = q;
@@ -758,7 +942,11 @@ class QInt {
             return str;
         }
 
+        // scan string and we have QInt q (2's complement)
         void ScanQInt(QInt &q, string str) {
+            for (int i = 0; i < 4; i++) {
+                q._data[i] = 0;
+            }
             if (!checkSpelling(str)) {
                 throw WRONG_FORMAT;
             }
@@ -825,7 +1013,10 @@ class QInt {
             return res;
         }
 
-        // operator + (QInt + QInt)
+        // operator +
+        // bool mys is something that terribly mystery
+        // mys = true: we dont care about overflow
+        // mys = false: we do care about overflow
         QInt optAdd(QInt q1, QInt q2, bool mys) {
             QInt res;
 
@@ -865,6 +1056,7 @@ class QInt {
             return res;
         }
 
+        // after this, we have a QInt (positive)
         void setBitSequence(string str, QInt &q) {
             int count = 127;
             // setup QInt x
@@ -946,12 +1138,12 @@ class QInt {
             if (!greaterThan(str, min)) {
                 return true;
             }
+            return false;
         }
 
-        /*  compare 2 string
-            input: 2 signed string
-            output: str1 > str2 ? true : false
-        */
+        // compare 2 string
+        // input: 2 signed string
+        // output: str1 > str2 ? true : false
         bool greaterThan(string str1, string str2) {
             if (str1 == str2) {
                 return false;
@@ -976,7 +1168,8 @@ class QInt {
                 return true;
             }
 
-            bool isGreaterThan; // compate 2 unsigned string
+            // compate 2 unsigned string
+            bool isGreaterThan; 
             if (str1.length() > str2.length()) {
                 isGreaterThan = true;
             }
@@ -1005,10 +1198,9 @@ class QInt {
             }
         }
 
-        /*  opt >
-            input: QInt, QInt
-            output: q1 > q2 ? true : false
-        */
+        // opt >
+        // input: QInt, QInt
+        // output: q1 > q2 ? true : false
         bool optGreaterThan(QInt q1, QInt q2) {
             string str1 = PrintQInt(q1);
             string str2 = PrintQInt(q2);
@@ -1016,10 +1208,9 @@ class QInt {
             return greaterThan(str1, str2);
         } 
 
-        /*  opt <
-            input: QInt, QInt
-            output: q1 < q2 ? true : false
-        */
+        // opt <
+        // input: QInt, QInt
+        // output: q1 < q2 ? true : false
         bool optSmallerThan(QInt q1,QInt q2) {
             if (!optGreaterThan(q1, q2) && !(q1 == q2)) {
                 return true;
@@ -1027,10 +1218,9 @@ class QInt {
             return false;
         }
 
-        /*  opt >=
-            input: QInt, QInt
-            output: q1 >= q2 ? true : false
-        */
+        // opt >=
+        // input: QInt, QInt
+        // output: q1 >= q2 ? true : false
         bool optGreaterThanOrEqual(QInt q1,QInt q2) {
             if (optGreaterThan(q1, q2) || q1 == q2) {
                 return true;
@@ -1038,10 +1228,9 @@ class QInt {
             return false;
         }
 
-        /*  opt <=
-            input: QInt, QInt
-            output: q1 <= q2 ? true : false
-        */
+        // opt <=
+        // input: QInt, QInt
+        // output: q1 <= q2 ? true : false
         bool optSmallerThanOrEqual(QInt q1,QInt q2) {
             if (!optGreaterThan(q1, q2)) {
                 return true;
@@ -1050,6 +1239,8 @@ class QInt {
         }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
         // return bitSequence of QInt q
         void testScan(QInt q) {
