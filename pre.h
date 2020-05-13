@@ -9,10 +9,14 @@ using namespace std;
 
 #include "string"
 #include "math.h"
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 enum ERROR {
     OUT_OF_RANGE,
-    WRONG_FORMAT
+    WRONG_FORMAT,
+    DIVIDE_BY_ZERO
 };
 
 void catchError(ERROR e) {
@@ -23,6 +27,10 @@ void catchError(ERROR e) {
 
         case WRONG_FORMAT: {
             cout << "Wrong format\n";
+        } break;
+
+        case DIVIDE_BY_ZERO: {
+            cout << "Divide by zero\n";
         } break;
     }
 }
