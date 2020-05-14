@@ -489,7 +489,7 @@ class QInt {
             return res;
         }
 
-        // operator - (function): 
+        // operator - (function)
         // input: 2 QInt
         // bool mys: is explained in QInt optAdd(QInt q1, QInt q2, bool mys)
         QInt optSub(QInt q1, QInt q2, bool mys) {
@@ -774,9 +774,8 @@ class QInt {
         // output: QInt (res)
         QInt optShiftLeft(QInt q1, int n) {
             string str = DecToBin(q1);
-            str = str.substr(n);
-
-            while (str.length() != 128) {
+            for (int i = 0; i < n; i++) {
+                str = str.substr(1);
                 str += "0";
             }
 
@@ -789,15 +788,12 @@ class QInt {
         // output: QInt (res)
         QInt optShiftRight(QInt q1, int n) {
             string str = DecToBin(q1);
-            str = str.substr(0, str.length() - n);
-
-            if (str[0] == '1') {
-                while (str.length() != 128) {
+            for (int i = 0; i < n; i++) {
+                str = str.substr(0, str.length() - 1);
+                if (str[0] == '1') {
                     str.insert(0, "1");
                 }
-            }
-            else {
-                while (str.length() != 128) {
+                else {
                     str.insert(0, "0");
                 }
             }

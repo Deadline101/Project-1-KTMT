@@ -1,10 +1,4 @@
-﻿#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <vector>
-#include <string.h>
-using namespace std;
+﻿#include "pre.h"
 
 #include "QFloat_file.h"
 #include "QInt_file.h"

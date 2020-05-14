@@ -1,18 +1,13 @@
-﻿#include <iostream>
-#include <string>
-#include <fstream>
-#include <sstream>
-#include <vector>
-using namespace std;
+﻿#include "pre.h"
 
 string MultiplyStr2(string s);
 string SubString1(string s);
 string SubString2(string s);
 bool ModString2(string s);
 bool isStrZero(string s);
-string NormalizeString(std::string &s);
+string NormalizeString(std::string& s);
 string DivideString2(string s);
-void Padding(string &a, string &b);
+void Padding(string& a, string& b);
 bool isLargerOrEqual(string a, string b);
 string SubtractString(string a, string b);
 string AddString(string a, string b);
@@ -86,7 +81,7 @@ bool isStrZero(string s) {
 }
 
 //Chuẩn hóa chuỗi - bỏ số 0 dư
-std::string NormalizeString(std::string &s) {
+std::string NormalizeString(std::string& s) {
 	int i = 0;
 	bool neg = false;
 	if (s[0] == '-' || s[0] == '+') {
@@ -162,7 +157,7 @@ string DivideString2(string s) {
 	return ans;
 }
 
-void Padding(string &a, string &b) {
+void Padding(string& a, string& b) {
 	NormalizeString(a);
 	NormalizeString(b);
 	int la, lb, la1, lb1;		//Chiều dài chuỗi a, b, chiều dài phần nguyên a, b
@@ -445,7 +440,7 @@ public:
 				break;
 		}
 		if (i == 16) {
-			if (tmp)  {//Toàn bit 1 ở phần exp 
+			if (tmp) {//Toàn bit 1 ở phần exp 
 				spec = 3; //Inf
 				for (; i < 128; i++)
 					if (GetBitI(i)) {
@@ -477,7 +472,7 @@ public:
 				subnormal = true;
 				return "Denormalized number";
 			}//xử lý cho số không chuẩn
-				
+
 
 
 			exp += 1 - 0x00004000; //Trừ lại cho bias
@@ -548,7 +543,7 @@ public:
 			if (GetBitI(0)) {
 				if (print_console)
 					//cout << '-';
-				ans.insert(ans.begin(), '-');
+					ans.insert(ans.begin(), '-');
 			}
 		}
 		else {
@@ -604,76 +599,3 @@ public:
 	}
 };
 
-struct 
-
-vector<string> loadDataFromFile(string filename)
-{
-	fstream file;
-	file.open(filename, ios::in);
-	vector<string> resault;
-	if (file) {
-		while (!file.eof()) {
-			string str;
-			getline(file, str);
-			resault.push_back(str);
-		}
-	}
-	file.close();
-	return resault;
-}
-
-struct Data
-{
-	string base1, base2;
-	string num;
-};
-
-vector<Data> loadDataFromArrayString(vector<string> str)
-{
-	vector<Data> resault;
-	for (int i = 0; i < str.size(); ++i) {
-		Data data;
-		stringstream ss(str[i]);
-		ss >> data.base1 >> data.base2 >> data.num;
-		resault.push_back(data);
-	}
-	return resault;
-}
-
-vector<string> setDataToVectorString(vector<Data> vData)
-{
-	vector<string> resault;
-	for (int i = 0; i < vData.size(); ++i) {
-		string str;
-		if (vData[i].base1 == "10" && vData[i].base2 == "2") {
-			Qfloat qfloat(vData[i].num);
-			str = Qfloat::DecToBin(qfloat);
-		}
-		else if (vData[i].base1 == "2" && vData[i].base2 == "10") {
-			str = Qfloat::BinToDec(vData[i].num).Print(0);
-			
-		}
-		resault.push_back(str);
-	}
-	return resault;
-}
-
-int main()
-{
-	vector<string> filedata = loadDataFromFile("QFloat_input.txt");
-
-	vector<Data> data = loadDataFromArrayString(filedata);
-
-	vector<string> dataForFile = setDataToVectorString(data);
-
-	fstream file;
-	file.open("QFloat_output.txt", ios::out);
-	if (file) {
-		for (int i = 0; i < dataForFile.size(); ++i) {
-			file << dataForFile[i] << endl;
-			cout << i + 1 << " " << dataForFile[i] << endl;
-		}
-	}
-	
-	return 1;
-}
