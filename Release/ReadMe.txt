@@ -1,5 +1,5 @@
---Mở cmd tại thư mục hiện hành
---Copy 1 trong 2 dòng ở dưới dán vào cmd và chạy lệnh
+-- open cmd at this directory  
+-- copy 1 of 2 lines below and paste into command line promp and hit enter  
 
-Project1.exe QInt_input.txt QInt_output.txt 1
-Project1.exe QFloat_input.txt QFloat_output.txt 2
+18120201_18120227_18120211_18120662_18120253.exe QInt_input.txt QInt_output.txt 1  
+18120201_18120227_18120211_18120662_18120253.exe QFloat_input.txt QFloat_output.txt 2  
