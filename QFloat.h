@@ -468,10 +468,10 @@ public:
 				base *= 2;
 			}
 
-			if (exp == 0) {
-				subnormal = true;
-				return "Denormalized number";
-			}//xử lý cho số không chuẩn
+			// if (exp == 0) {
+			// 	subnormal = true;
+			// 	return "Denormalized number";
+			// }//xử lý cho số không chuẩn
 
 
 
