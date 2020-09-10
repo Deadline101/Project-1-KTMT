@@ -1,6 +1,12 @@
 # Project 1 - Môn Kiến trúc máy tính & Hợp ngữ  
 
-* Đồ án lập trình số lớn 128bit và số chấm động độ chính xác bố của cao  
+* Đồ án lập trình tính toán và lưu trữ số nguyên lớn và số chấm động độ chính xác bố của cao có độ dài 128 bit  
+* Team đồ án:  
+    1. Nguyễn Bảo Long  
+    2. Võ Thế Minh  
+    3. Trà Anh Toàn  
+    4. Phạm Văn Minh Phương  
+    5. Mai Ngọc Tú  
 
 ## Chức năng  
 
